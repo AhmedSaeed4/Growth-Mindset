@@ -10,6 +10,8 @@ st.write("Transform your files between CSV and Excel formats with built-in data 
 
 uploaded_files = st.file_uploader("Upload your files (CSV or Excel):", type=["csv", "xlsx"], accept_multiple_files=True)
 
+processing_done = False
+
 if uploaded_files:
     for file in uploaded_files:
         file_extension = os.path.splitext(file.name)[-1].lower()
@@ -34,12 +36,12 @@ if uploaded_files:
             with col1:
                 if st.button(f"Remove Duplicates from {file.name}"):
                     df.drop_duplicates(inplace=True)
-                    st.write("Duplicates Removed!")
+                    st.write("✅ Duplicates Removed!")  
             with col2:
                 if st.button(f"Fill Missing Values for {file.name}"):
                     numeric_cols = df.select_dtypes(include=['number']).columns
                     df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].mean())
-                    st.write("Missing Values in Numeric Columns Filled with Column Means!")
+                    st.write("✅ Missing Values in Numeric Columns Filled with Column Means!") 
 
         st.subheader("🎯 Select Columns to Convert")
         columns = st.multiselect(f"Choose Columns for {file.name}", df.columns, default=df.columns)
@@ -64,10 +66,12 @@ if uploaded_files:
             buffer.seek(0)
             
             st.download_button(
-                label=f"⬇️ Download {file.name} as {conversion_type}",
+                label=f"⬇️ Download {file.name} as {conversion_type}",  
                 data=buffer,
                 file_name=file_name,
                 mime=mime_type
             )
+            processing_done = True  
 
-st.success("🎉 All files processed successfully!")
+if processing_done:
+    st.success("🎉 All files processed successfully!")  
